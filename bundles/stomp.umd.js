@@ -1724,21 +1724,21 @@ var StompHandler = /** @class */ (function () {
             setTimeout(function () {
                 clearInterval(oldPinger);
                 clearInterval(oldPonger);
-            }, 2000);
+            }, 2000); // BLUEIQ NOTE: This is hardcoded since this solution is more of a hack.
             _this._pinger = setInterval(function () {
                 if (_this._webSocket.readyState === web_socket_state_1.WebSocketState.OPEN) {
                     _this._webSocket.send(byte_1.BYTE.LF);
                     _this.debug('>>> PING');
                 }
-            }, 10000);
+            }, _this._ttlI);
             _this._ponger = setInterval(function () {
                 var delta = Date.now() - _this._lastServerActivityTS;
                 // We wait twice the TTL to be flexible on window's setInterval calls
-                if (delta > 10000 * 2) {
+                if (delta > (_this._ttlO * 2)) {
                     _this.debug("did not receive server activity for the last " + delta + "ms");
                     _this._webSocket.close();
                 }
-            }, 10000);
+            }, _this._ttlO);
         });
         this._webSocket.onmessage = function (evt) {
             _this.debug('Received data');
@@ -1776,26 +1776,26 @@ var StompHandler = /** @class */ (function () {
         //     heart-beat: sx, sy
         var _a = (headers['heart-beat']).split(',').map(function (v) { return parseInt(v, 10); }), serverOutgoing = _a[0], serverIncoming = _a[1];
         if ((this.heartbeatOutgoing !== 0) && (serverIncoming !== 0)) {
-            var ttl = Math.max(this.heartbeatOutgoing, serverIncoming);
-            this.debug("send PING every " + ttl + "ms");
+            this._ttlI = Math.max(this.heartbeatOutgoing, serverIncoming);
+            this.debug("send PING every " + this._ttlI + "ms");
             this._pinger = setInterval(function () {
                 if (_this._webSocket.readyState === web_socket_state_1.WebSocketState.OPEN) {
                     _this._webSocket.send(byte_1.BYTE.LF);
                     _this.debug('>>> PING');
                 }
-            }, ttl);
+            }, this._ttlI);
         }
         if ((this.heartbeatIncoming !== 0) && (serverOutgoing !== 0)) {
-            var ttl_1 = Math.max(this.heartbeatIncoming, serverOutgoing);
-            this.debug("check PONG every " + ttl_1 + "ms");
+            this._ttlO = Math.max(this.heartbeatIncoming, serverOutgoing);
+            this.debug("check PONG every " + this._ttlO + "ms");
             this._ponger = setInterval(function () {
                 var delta = Date.now() - _this._lastServerActivityTS;
                 // We wait twice the TTL to be flexible on window's setInterval calls
-                if (delta > (ttl_1 * 2)) {
+                if (delta > (_this._ttlO * 2)) {
                     _this.debug("did not receive server activity for the last " + delta + "ms");
                     _this._webSocket.close();
                 }
-            }, ttl_1);
+            }, this._ttlO);
         }
     };
     StompHandler.prototype._transmit = function (params) {

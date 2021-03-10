@@ -83,6 +83,8 @@ export class StompHandler {
   private _pinger: any;
   private _ponger: any;
   private _lastServerActivityTS: number;
+  private _ttlI: number;
+  private _ttlO: number;
 
   constructor(private _client: Client, private _webSocket: WebSocket, config: StompConfig = {}) {
     // used to index subscribers
@@ -130,21 +132,21 @@ export class StompHandler {
         setTimeout(() => {
           clearInterval(oldPinger);
           clearInterval(oldPonger);
-        }, 2000);
+        }, 2000); // BLUEIQ NOTE: This is hardcoded since this solution is more of a hack.
         this._pinger = setInterval(() => {
           if (this._webSocket.readyState === WebSocketState.OPEN) {
             this._webSocket.send(BYTE.LF);
             this.debug('>>> PING');
           }
-        }, 10000);
+        }, this._ttlI);
         this._ponger = setInterval(() => {
           const delta = Date.now() - this._lastServerActivityTS;
           // We wait twice the TTL to be flexible on window's setInterval calls
-          if (delta > 10000 * 2) {
+          if (delta > (this._ttlO * 2)) {
             this.debug(`did not receive server activity for the last ${delta}ms`);
             this._webSocket.close();
           }
-        }, 10000);
+        }, this._ttlO);
       }
     );
 
@@ -255,27 +257,27 @@ export class StompHandler {
     const [serverOutgoing, serverIncoming] = (headers['heart-beat']).split(',').map((v: string) => parseInt(v, 10));
 
     if ((this.heartbeatOutgoing !== 0) && (serverIncoming !== 0)) {
-      const ttl: number = Math.max(this.heartbeatOutgoing, serverIncoming);
-      this.debug(`send PING every ${ttl}ms`);
+      this._ttlI = Math.max(this.heartbeatOutgoing, serverIncoming);
+      this.debug(`send PING every ${this._ttlI}ms`);
       this._pinger = setInterval(() => {
         if (this._webSocket.readyState === WebSocketState.OPEN) {
           this._webSocket.send(BYTE.LF);
           this.debug('>>> PING');
         }
-      }, ttl);
+      }, this._ttlI);
     }
 
     if ((this.heartbeatIncoming !== 0) && (serverOutgoing !== 0)) {
-      const ttl: number = Math.max(this.heartbeatIncoming, serverOutgoing);
-      this.debug(`check PONG every ${ttl}ms`);
+      this._ttlO = Math.max(this.heartbeatIncoming, serverOutgoing);
+      this.debug(`check PONG every ${this._ttlO}ms`);
       this._ponger = setInterval(() => {
         const delta = Date.now() - this._lastServerActivityTS;
         // We wait twice the TTL to be flexible on window's setInterval calls
-        if (delta > (ttl * 2)) {
+        if (delta > (this._ttlO * 2)) {
           this.debug(`did not receive server activity for the last ${delta}ms`);
           this._webSocket.close();
         }
-      }, ttl);
+      }, this._ttlO);
     }
   }
 

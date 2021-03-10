@@ -46,6 +46,8 @@ export declare class StompHandler {
     private _pinger;
     private _ponger;
     private _lastServerActivityTS;
+    private _ttlI;
+    private _ttlO;
     constructor(_client: Client, _webSocket: WebSocket, config?: StompConfig);
     configure(conf: StompConfig): void;
     start(): void;
