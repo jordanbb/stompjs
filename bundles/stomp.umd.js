@@ -1719,6 +1719,26 @@ var StompHandler = /** @class */ (function () {
         // On Incoming Ping
         function () {
             _this.debug('<<< PONG');
+            var oldPinger = _this._pinger;
+            var oldPonger = _this._ponger;
+            setTimeout(function () {
+                clearInterval(oldPinger);
+                clearInterval(oldPonger);
+            }, 2000);
+            _this._pinger = setInterval(function () {
+                if (_this._webSocket.readyState === web_socket_state_1.WebSocketState.OPEN) {
+                    _this._webSocket.send(byte_1.BYTE.LF);
+                    _this.debug('>>> PING');
+                }
+            }, 10000);
+            _this._ponger = setInterval(function () {
+                var delta = Date.now() - _this._lastServerActivityTS;
+                // We wait twice the TTL to be flexible on window's setInterval calls
+                if (delta > 10000 * 2) {
+                    _this.debug("did not receive server activity for the last " + delta + "ms");
+                    _this._webSocket.close();
+                }
+            }, 10000);
         });
         this._webSocket.onmessage = function (evt) {
             _this.debug('Received data');
@@ -2097,7 +2117,7 @@ var WebSocketState;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/kdeepak/MyWork/Tech/stomp/stompjs/src/index.ts */"./src/index.ts");
+module.exports = __webpack_require__(/*! C:\Users\gregn\Desktop\BlueIQStomp\stompjs\src\index.ts */"./src/index.ts");
 
 
 /***/ })

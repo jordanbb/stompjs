@@ -125,6 +125,26 @@ export class StompHandler {
       // On Incoming Ping
       () => {
         this.debug('<<< PONG');
+        const oldPinger = this._pinger;
+        const oldPonger = this._ponger;
+        setTimeout(() => {
+          clearInterval(oldPinger);
+          clearInterval(oldPonger);
+        }, 2000);
+        this._pinger = setInterval(() => {
+          if (this._webSocket.readyState === WebSocketState.OPEN) {
+            this._webSocket.send(BYTE.LF);
+            this.debug('>>> PING');
+          }
+        }, 10000);
+        this._ponger = setInterval(() => {
+          const delta = Date.now() - this._lastServerActivityTS;
+          // We wait twice the TTL to be flexible on window's setInterval calls
+          if (delta > 10000 * 2) {
+            this.debug(`did not receive server activity for the last ${delta}ms`);
+            this._webSocket.close();
+          }
+        }, 10000);
       }
     );
 

@@ -120,6 +120,26 @@ var StompHandler = /** @class */ (function () {
         // On Incoming Ping
         function () {
             _this.debug('<<< PONG');
+            var oldPinger = _this._pinger;
+            var oldPonger = _this._ponger;
+            setTimeout(function () {
+                clearInterval(oldPinger);
+                clearInterval(oldPonger);
+            }, 2000);
+            _this._pinger = setInterval(function () {
+                if (_this._webSocket.readyState === web_socket_state_1.WebSocketState.OPEN) {
+                    _this._webSocket.send(byte_1.BYTE.LF);
+                    _this.debug('>>> PING');
+                }
+            }, 10000);
+            _this._ponger = setInterval(function () {
+                var delta = Date.now() - _this._lastServerActivityTS;
+                // We wait twice the TTL to be flexible on window's setInterval calls
+                if (delta > 10000 * 2) {
+                    _this.debug("did not receive server activity for the last " + delta + "ms");
+                    _this._webSocket.close();
+                }
+            }, 10000);
         });
         this._webSocket.onmessage = function (evt) {
             _this.debug('Received data');
