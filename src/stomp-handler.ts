@@ -127,6 +127,10 @@ export class StompHandler {
       // On Incoming Ping
       () => {
         this.debug('<<< PONG');
+        if (!this._ttlO || !this._ttlI) {
+          console.log('%c!!! received pong before running heartbeat setup !!!', 'color: orange');
+          return;
+        }
         const oldPinger = this._pinger;
         const oldPonger = this._ponger;
         setTimeout(() => {
