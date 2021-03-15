@@ -85,6 +85,7 @@ export class StompHandler {
   private _lastServerActivityTS: number;
   private _ttlI: number;
   private _ttlO: number;
+  private _lastTimeSetHeartbeatInterval: number;
 
   constructor(private _client: Client, private _webSocket: WebSocket, config: StompConfig = {}) {
     // used to index subscribers
@@ -133,6 +134,10 @@ export class StompHandler {
         }
         const oldPinger = this._pinger;
         const oldPonger = this._ponger;
+        if (Date.now() - this._lastTimeSetHeartbeatInterval < Math.max(this._ttlI, this._ttlO) - 1000) {
+          return;
+        }
+        this._lastTimeSetHeartbeatInterval = Date.now();
         setTimeout(() => {
           clearInterval(oldPinger);
           clearInterval(oldPonger);

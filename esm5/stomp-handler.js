@@ -126,6 +126,10 @@ var StompHandler = /** @class */ (function () {
             }
             var oldPinger = _this._pinger;
             var oldPonger = _this._ponger;
+            if (Date.now() - _this._lastTimeSetHeartbeatInterval < Math.max(_this._ttlI, _this._ttlO) - 1000) {
+                return;
+            }
+            _this._lastTimeSetHeartbeatInterval = Date.now();
             setTimeout(function () {
                 clearInterval(oldPinger);
                 clearInterval(oldPonger);

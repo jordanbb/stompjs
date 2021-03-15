@@ -48,6 +48,7 @@ export declare class StompHandler {
     private _lastServerActivityTS;
     private _ttlI;
     private _ttlO;
+    private _lastTimeSetHeartbeatInterval;
     constructor(_client: Client, _webSocket: WebSocket, config?: StompConfig);
     configure(conf: StompConfig): void;
     start(): void;
