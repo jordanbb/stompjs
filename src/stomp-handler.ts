@@ -130,7 +130,6 @@ export class StompHandler {
       // On Incoming Ping
       () => {
         this.debug('<<< PONG');
-        console.log('this.useLegacyHeartbeatLogic: ' + this.useLegacyHeartbeatLogic );
         if (this.useLegacyHeartbeatLogic || !this._ttlO || !this._ttlI) {
           return;
         }
