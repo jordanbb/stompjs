@@ -204,6 +204,7 @@ var Client = /** @class */ (function () {
          * Outgoing heartbeat interval in milliseconds. Set to 0 to disable.
          */
         this.heartbeatOutgoing = 10000;
+        this.useLegacyHeartbeatLogic = false;
         /**
          * This switches on a non standard behavior while sending WebSocket packets.
          * It splits larger (text) packets into chunks of [maxWebSocketChunkSize]{@link Client#maxWebSocketChunkSize}.
@@ -364,6 +365,7 @@ var Client = /** @class */ (function () {
                             disconnectHeaders: this._disconnectHeaders,
                             heartbeatIncoming: this.heartbeatIncoming,
                             heartbeatOutgoing: this.heartbeatOutgoing,
+                            useLegacyHeartbeatLogic: this.useLegacyHeartbeatLogic,
                             splitLargeFrames: this.splitLargeFrames,
                             maxWebSocketChunkSize: this.maxWebSocketChunkSize,
                             forceBinaryWSFrames: this.forceBinaryWSFrames,
@@ -1719,8 +1721,8 @@ var StompHandler = /** @class */ (function () {
         // On Incoming Ping
         function () {
             _this.debug('<<< PONG');
-            if (!_this._ttlO || !_this._ttlI) {
-                console.log('%c!!! received pong before running heartbeat setup !!!', 'color: orange');
+            console.log('this.useLegacyHeartbeatLogic: ' + _this.useLegacyHeartbeatLogic);
+            if (_this.useLegacyHeartbeatLogic || !_this._ttlO || !_this._ttlI) {
                 return;
             }
             var oldPinger = _this._pinger;

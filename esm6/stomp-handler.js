@@ -118,8 +118,8 @@ var StompHandler = /** @class */ (function () {
         // On Incoming Ping
         function () {
             _this.debug('<<< PONG');
-            if (!_this._ttlO || !_this._ttlI) {
-                console.log('%c!!! received pong before running heartbeat setup !!!', 'color: orange');
+            console.log('this.useLegacyHeartbeatLogic: ' + _this.useLegacyHeartbeatLogic);
+            if (_this.useLegacyHeartbeatLogic || !_this._ttlO || !_this._ttlI) {
                 return;
             }
             var oldPinger = _this._pinger;

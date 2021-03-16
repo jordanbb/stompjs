@@ -60,6 +60,7 @@ export declare class Client {
      * Outgoing heartbeat interval in milliseconds. Set to 0 to disable.
      */
     heartbeatOutgoing: number;
+    useLegacyHeartbeatLogic: boolean;
     /**
      * This switches on a non standard behavior while sending WebSocket packets.
      * It splits larger (text) packets into chunks of [maxWebSocketChunkSize]{@link Client#maxWebSocketChunkSize}.

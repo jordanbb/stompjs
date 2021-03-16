@@ -34,6 +34,10 @@ export declare class StompConfig {
      */
     heartbeatOutgoing?: number;
     /**
+     * See [Client#useLegacyHeartbeatLogic]{@link Client#useLegacyHeartbeatLogic}.
+     */
+    useLegacyHeartbeatLogic?: boolean;
+    /**
      * See [Client#splitLargeFrames]{@link Client#splitLargeFrames}.
      */
     splitLargeFrames?: boolean;

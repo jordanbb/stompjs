@@ -34,6 +34,7 @@ export declare class StompHandler {
     maxWebSocketChunkSize: number;
     forceBinaryWSFrames: boolean;
     appendMissingNULLonIncoming: boolean;
+    useLegacyHeartbeatLogic: boolean;
     readonly connectedVersion: string;
     private _connectedVersion;
     readonly connected: boolean;

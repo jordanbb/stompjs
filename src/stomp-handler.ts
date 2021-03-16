@@ -64,6 +64,8 @@ export class StompHandler {
 
   public appendMissingNULLonIncoming: boolean;
 
+  public useLegacyHeartbeatLogic: boolean;
+
   get connectedVersion(): string {
     return this._connectedVersion;
   }
@@ -128,8 +130,8 @@ export class StompHandler {
       // On Incoming Ping
       () => {
         this.debug('<<< PONG');
-        if (!this._ttlO || !this._ttlI) {
-          console.log('%c!!! received pong before running heartbeat setup !!!', 'color: orange');
+        console.log('this.useLegacyHeartbeatLogic: ' + this.useLegacyHeartbeatLogic );
+        if (this.useLegacyHeartbeatLogic || !this._ttlO || !this._ttlI) {
           return;
         }
         const oldPinger = this._pinger;

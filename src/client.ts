@@ -76,6 +76,8 @@ export class Client {
    */
   public heartbeatOutgoing: number = 10000;
 
+  public useLegacyHeartbeatLogic: boolean = false;
+
   /**
    * This switches on a non standard behavior while sending WebSocket packets.
    * It splits larger (text) packets into chunks of [maxWebSocketChunkSize]{@link Client#maxWebSocketChunkSize}.
@@ -364,6 +366,7 @@ export class Client {
       disconnectHeaders: this._disconnectHeaders,
       heartbeatIncoming: this.heartbeatIncoming,
       heartbeatOutgoing: this.heartbeatOutgoing,
+      useLegacyHeartbeatLogic: this.useLegacyHeartbeatLogic,
       splitLargeFrames: this.splitLargeFrames,
       maxWebSocketChunkSize: this.maxWebSocketChunkSize,
       forceBinaryWSFrames: this.forceBinaryWSFrames,
